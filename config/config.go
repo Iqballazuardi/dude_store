@@ -8,7 +8,8 @@ import (
 )
 
 func InitSQL() *sql.DB {
-	db, err := sql.Open("mysql", "root:lazuardi12@tcp(127.0.0.1:3306)/dudeStore")
+
+	db, err := sql.Open("mysql", "root:lazuardi12@tcp(127.0.0.1:3306)/mydb")
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -18,6 +19,7 @@ func InitSQL() *sql.DB {
 		fmt.Println(db.Ping().Error())
 		return nil
 	}
-
+	defer db.Close()
+	fmt.Println("yes")
 	return db
 }

@@ -2,11 +2,12 @@ package main
 
 import (
 	"dudeStore/dudeStore/config"
-	"fmt"
+	"dudeStore/dudeStore/data"
 )
 
 func main() {
-	db := config.InitSQL()
-	defer db.Close()
-	fmt.Println(db)
+	koneksi := config.InitSQL()
+	mdl := data.Model{}
+	mdl.SetSQLConnection(koneksi)
+
 }
