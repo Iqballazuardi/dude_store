@@ -39,6 +39,46 @@ func main() {
 			fmt.Scanln(&menu)
 			if menu == 0 {
 				break
+			} else if menu == 1 {
+				var pegawai = data.Pegawai{}
+				fmt.Print("Masukkan Nama Pegawai: ")
+				fmt.Scanln(&pegawai.Nama)
+				fmt.Print("Masukkan Username Pegawai: ")
+				fmt.Scanln(&pegawai.Username)
+				fmt.Print("Masukkan Password Pegawai: ")
+				fmt.Scanln(&pegawai.Password)
+				fmt.Print("Masukkan Email Pegawai: ")
+				fmt.Scanln(&pegawai.Email)
+				err := mdl.TambahPegawai(pegawai)
+				if err != nil {
+					fmt.Printf("Username sudah ada, GAGAL membuat Akun\n\n")
+
+				} else {
+
+					fmt.Printf("Pegawai BERHASIL ditambahkan!\n\n")
+				}
+
+			} else if menu == 2 {
+				var email string
+				fmt.Print("Masukkan email Pegawai:")
+				fmt.Scanln(&email)
+				err := mdl.DeletePegawai(email)
+				if err != nil {
+					fmt.Println("Terjadi sebuah kesalahan")
+					break
+				}
+
+				fmt.Println("sukses menghapus data")
+			} else if menu == 3 {
+				res, err := mdl.GetAllPegawai()
+				if err != nil {
+					fmt.Println("Terjadi sebuah kesalahan")
+					break
+				}
+
+				for i := 0; i < len(res); i++ {
+					fmt.Println(res[i])
+				}
 			}
 		}
 	} else {

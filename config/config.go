@@ -19,7 +19,7 @@ func InitSQL() *sql.DB {
 		fmt.Println(db.Ping().Error())
 		return nil
 	}
-	defer db.Close()
+	// defer db.Close()
 	fmt.Println("yes")
 	return db
 }
