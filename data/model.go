@@ -16,7 +16,8 @@ func (m *Model) SetSQLConnection(db *sql.DB) {
 func (m *Model) Login(username string, password string) (*Pegawai, error) {
 	var pegawai = Pegawai{}
 
-	err := m.conn.QueryRow("SELECT nama, idpegawai FROM pegawai where username = ? AND password = ?", username, password).Scan(&pegawai.Nama, &pegawai.Id)
+	err := m.conn.QueryRow("SELECT nama, idpegawai FROM pegawai where username = ? AND password = ?",
+		username, password).Scan(&pegawai.Nama, &pegawai.Id)
 
 	if err != nil {
 		return nil, err
@@ -25,8 +26,18 @@ func (m *Model) Login(username string, password string) (*Pegawai, error) {
 	return &pegawai, nil
 }
 
-func (m *Model) TambahPegawai(newPegawai Pegawai) error {
-	res, err := m.conn.Exec("INSERT INTO pegawai (nama, username, password,email) values(?,?,?,?)", newPegawai.Nama, newPegawai.Username, newPegawai.Password, newPegawai.Email)
+func (m *Model) TambahPegawai(Pegawai) error {
+	var pegawai = Pegawai{}
+	fmt.Print("Masukkan Nama Pegawai: ")
+	fmt.Scanln(&pegawai.Nama)
+	fmt.Print("Masukkan Username Pegawai: ")
+	fmt.Scanln(&pegawai.Username)
+	fmt.Print("Masukkan Password Pegawai: ")
+	fmt.Scanln(&pegawai.Password)
+	fmt.Print("Masukkan Email Pegawai: ")
+	fmt.Scanln(&pegawai.Email)
+	res, err := m.conn.Exec("INSERT INTO pegawai (nama, username, password,email) values(?,?,?,?)",
+		pegawai.Nama, pegawai.Username, pegawai.Password, pegawai.Email)
 
 	if err != nil {
 		fmt.Println(err)
@@ -137,6 +148,61 @@ func (m *Model) TambahPelanggan(newPelanggan Pelanggan) error {
 	}
 
 	// m.conn.Close()
+
+	return nil
+}
+
+func (m *Model) GetProdukById(id int) (*Produk, error) {
+	row := m.conn.QueryRow("SELECT * FROM produk WHERE idproduk = ?", id)
+
+	var produk Produk
+	err := row.Scan(&produk.Id, &produk.Nama, &produk.Keterangan, &produk.Stok, &produk.Harga)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("produk tidak ditemukan")
+		} else {
+			return nil, err
+		}
+	}
+
+	return &produk, nil
+}
+
+func (m *Model) UpdateProduk(id int, updatedProduk Produk) error {
+	tx, err := m.conn.Begin()
+
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		} else {
+			tx.Commit()
+		}
+	}()
+	_, err = m.GetProdukById(id)
+	if err != nil {
+		return err
+	}
+	res, err := tx.Exec("UPDATE produk SET nama = ?, keterangan = ?, stok = ?, harga = ? WHERE idproduk = ?",
+		updatedProduk.Nama, updatedProduk.Keterangan, updatedProduk.Stok, updatedProduk.Harga, id)
+
+	if err != nil {
+		return err
+	}
+
+	aff, err := res.RowsAffected()
+
+	if err != nil {
+		return err
+	}
+
+	if aff <= 0 {
+		return errors.New("tidak ada produk yang diupdate")
+	}
 
 	return nil
 }
