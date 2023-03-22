@@ -10,7 +10,8 @@ func main() {
 	koneksi := config.InitSQL()
 	mdl := data.Model{}
 	mdl.SetSQLConnection(koneksi)
-
+	var id int
+	var nama string
 	var username string
 	var password string
 
@@ -23,7 +24,12 @@ func main() {
 	if username == "admin" {
 		var menu int
 		for menu != 99 {
-			fmt.Println("Selamat datang admin")
+			res, err := mdl.Login(username, password)
+			if err != nil {
+				fmt.Println("password/username salah", err)
+				break
+			}
+			fmt.Println("halo selamat datang " + res.Nama)
 			fmt.Println("1.Tambahkan Pegawai")
 			fmt.Println("2.Hapus Pegawai")
 			fmt.Println("3.Daftar Pegawai")
@@ -90,13 +96,15 @@ func main() {
 				fmt.Scanln(&produk.Stok)
 				fmt.Print("Masukkan Harga produk: ")
 				fmt.Scanln(&produk.Harga)
+				produk.Pegawai_id = id
+				// fmt.Print(produk)
 				err := mdl.TambahProduk(produk)
 				if err != nil {
 					fmt.Printf("GAGAL menahbahkan Produk\n\n")
 
 				} else {
 
-					fmt.Printf("Pegawai BERHASIL ditambahkan!\n\n")
+					fmt.Printf("Produk BERHASIL ditambahkan!\n\n")
 				}
 			}
 		}
@@ -106,21 +114,44 @@ func main() {
 		for menu != 99 {
 			res, err := mdl.Login(username, password)
 			if err != nil {
-				fmt.Println("password/username salah")
+				fmt.Println("password/username salah", err)
 				break
 			}
-			fmt.Println("halo selamat datang " + res.Nama)
+			id = res.Id
+			nama = res.Nama
+			fmt.Println("halo selamat datang " + nama)
+			// fmt.Println(res)
 			fmt.Println("1.Tambahkan Pelanggan")
 			fmt.Println("2.Tambahkan Produk")
 			fmt.Println("3.Update Produk")
 			fmt.Println("4.Daftar Produk")
 			fmt.Println("5.Daftar Pelanggan")
+			fmt.Println("6.Tambahkan Transaksi")
+			fmt.Println("7.Daftar Transaksi")
 			fmt.Println("0.Log Out")
 			fmt.Scanln(&menu)
 			if menu == 0 {
 				fmt.Println("Terima kasih telah melakukan pekerjaan anda")
 				break
-			} else if menu == 5 {
+			} else if menu == 1 {
+				var pelanggan = data.Pelanggan{}
+				fmt.Print("Masukkan Nama pelanggan: ")
+				fmt.Scanln(&pelanggan.Nama)
+				fmt.Print("Masukkan Nomor HP pelanggan: ")
+				fmt.Scanln(&pelanggan.Hp)
+				fmt.Print("Masukkan Alamat pelanggan: ")
+				fmt.Scanln(&pelanggan.Alamat)
+				pelanggan.Pegawai_id = id
+				// fmt.Print(pelanggan)
+				err := mdl.TambahPelanggan(pelanggan)
+				if err != nil {
+					fmt.Printf("GAGAL menahbahkan pelanggan\n\n")
+
+				} else {
+
+					fmt.Printf("pelanggan BERHASIL ditambahkan!\n\n")
+				}
+			} else if menu == 2 {
 				var produk = data.Produk{}
 				fmt.Print("Masukkan Nama produk: ")
 				fmt.Scanln(&produk.Nama)
@@ -130,13 +161,15 @@ func main() {
 				fmt.Scanln(&produk.Stok)
 				fmt.Print("Masukkan Harga produk: ")
 				fmt.Scanln(&produk.Harga)
+				produk.Pegawai_id = id
+				// fmt.Print(produk)
 				err := mdl.TambahProduk(produk)
 				if err != nil {
 					fmt.Printf("GAGAL menahbahkan Produk\n\n")
 
 				} else {
 
-					fmt.Printf("Pegawai BERHASIL ditambahkan!\n\n")
+					fmt.Printf("Produk BERHASIL ditambahkan!\n\n")
 				}
 			}
 		}
