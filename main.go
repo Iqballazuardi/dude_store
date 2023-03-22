@@ -47,19 +47,9 @@ func main() {
 				fmt.Println("Terima kasih telah melakukan pekerjaan anda")
 				break
 			} else if menu == 1 {
-				var pegawai = data.Pegawai{}
-				fmt.Print("Masukkan Nama Pegawai: ")
-				fmt.Scanln(&pegawai.Nama)
-				fmt.Print("Masukkan Username Pegawai: ")
-				fmt.Scanln(&pegawai.Username)
-				fmt.Print("Masukkan Password Pegawai: ")
-				fmt.Scanln(&pegawai.Password)
-				fmt.Print("Masukkan Email Pegawai: ")
-				fmt.Scanln(&pegawai.Email)
-				err := mdl.TambahPegawai(pegawai)
+				err := mdl.TambahPegawai(data.Pegawai{})
 				if err != nil {
 					fmt.Printf("Username sudah ada, GAGAL membuat Akun\n\n")
-
 				} else {
 
 					fmt.Printf("Pegawai BERHASIL ditambahkan!\n\n")
@@ -102,8 +92,37 @@ func main() {
 				if err != nil {
 					fmt.Printf("GAGAL menahbahkan Produk\n\n")
 
-				} else {
+				} else if menu == 5 {
+					fmt.Print("Masukkan ID produk yang ingin diupdate: ")
+					var id int
+					fmt.Scanln(&id)
 
+					existingProduk, err := mdl.GetProdukById(id)
+					if err != nil {
+						fmt.Printf("Gagal mendapatkan produk: %v\n\n", err)
+					} else if existingProduk == nil {
+						fmt.Printf("Tidak ada produk dengan ID %d\n\n", id)
+					} else {
+						fmt.Printf("Produk saat ini: %+v\n", existingProduk)
+
+						var updatedProduk data.Produk
+						fmt.Print("Masukkan nama produk baru: ")
+						fmt.Scanln(&updatedProduk.Nama)
+						fmt.Print("Masukkan keterangan produk baru: ")
+						fmt.Scanln(&updatedProduk.Keterangan)
+						fmt.Print("Masukkan stok produk baru: ")
+						fmt.Scanln(&updatedProduk.Stok)
+						fmt.Print("Masukkan harga produk baru: ")
+						fmt.Scanln(&updatedProduk.Harga)
+
+						err = mdl.UpdateProduk(id, updatedProduk)
+						if err != nil {
+							fmt.Printf("Gagal mengupdate produk: %v\n\n", err)
+						} else {
+							fmt.Println("Produk berhasil diupdate\n")
+						}
+					}
+				} else {
 					fmt.Printf("Produk BERHASIL ditambahkan!\n\n")
 				}
 			}
