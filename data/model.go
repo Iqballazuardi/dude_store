@@ -16,12 +16,12 @@ func (m *Model) SetSQLConnection(db *sql.DB) {
 func (m *Model) Login(username string, password string) (*Pegawai, error) {
 	var pegawai = Pegawai{}
 
-	err := m.conn.QueryRow("SELECT nama, username FROM pegawai where username = ? AND password = ?", username, password).Scan(&pegawai.Nama, &pegawai.Username)
+	err := m.conn.QueryRow("SELECT nama, idpegawai FROM pegawai where username = ? AND password = ?", username, password).Scan(&pegawai.Nama, &pegawai.Id)
 
 	if err != nil {
 		return nil, err
 	}
-
+	// m.conn.Close()
 	return &pegawai, nil
 }
 
@@ -44,7 +44,7 @@ func (m *Model) TambahPegawai(newPegawai Pegawai) error {
 		return errors.New("terjadi sebuah masalah pada sistem")
 	}
 
-	m.conn.Close()
+	// m.conn.Close()
 
 	return nil
 }
@@ -90,12 +90,12 @@ func (m Model) GetAllPegawai() ([]Pegawai, error) {
 
 		listPegawai = append(listPegawai, newPegawai)
 	}
-	m.conn.Close()
+	// m.conn.Close()
 
 	return listPegawai, nil
 }
 func (m *Model) TambahProduk(newProduk Produk) error {
-	res, err := m.conn.Exec("INSERT INTO produk (nama, keterangan, stok ,harga,pegawai_idPegawai) values(?,?,?,?)", newProduk.Nama, newProduk.Keterangan, newProduk.Stok, newProduk.Harga, newProduk.Pegawai_id)
+	res, err := m.conn.Exec("INSERT INTO produk (nama, keterangan, stok , harga, pegawai_idpegawai) values(?,?,?,?,?)", newProduk.Nama, newProduk.Keterangan, newProduk.Stok, newProduk.Harga, newProduk.Pegawai_id)
 
 	if err != nil {
 		fmt.Println(err)
@@ -113,7 +113,30 @@ func (m *Model) TambahProduk(newProduk Produk) error {
 		return errors.New("terjadi sebuah masalah pada sistem")
 	}
 
-	m.conn.Close()
+	// m.conn.Close()
+
+	return nil
+}
+func (m *Model) TambahPelanggan(newPelanggan Pelanggan) error {
+	res, err := m.conn.Exec("INSERT INTO pelanggan (nama, hp, alamat, pegawai_idpegawai) values(?,?,?,?)", newPelanggan.Nama, newPelanggan.Hp, newPelanggan.Alamat, newPelanggan.Pegawai_id)
+
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	aff, err := res.RowsAffected()
+
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	if aff <= 0 {
+		return errors.New("terjadi sebuah masalah pada sistem")
+	}
+
+	// m.conn.Close()
 
 	return nil
 }

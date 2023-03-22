@@ -28,7 +28,7 @@ type Transaksi struct {
 	Nama_produk     string
 	Qty             int
 	Total_transaksi int
-	Create_at       time.Time
+	Create_at       string
 	Pelanggan_id    int
 	Pegawai_id      int
 }
@@ -38,7 +38,7 @@ type Pelanggan struct {
 	Hp         string
 	Nama       string
 	Alamat     string
-	Create_at  time.Time
+	Create_at  string
 	Pegawai_id int
 }
 type Detail_transaksi struct {
