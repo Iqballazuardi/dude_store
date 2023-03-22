@@ -153,11 +153,10 @@ func (m *Model) TambahPelanggan(newPelanggan Pelanggan) error {
 }
 
 func (m *Model) GetProdukById(id int) (*Produk, error) {
-	row := m.conn.QueryRow("SELECT * FROM produk WHERE idproduk = ?", id)
+	row := m.conn.QueryRow("SELECT idproduk, nama, keterangan, stok, harga  FROM produk WHERE idproduk = ?", id)
 
 	var produk Produk
 	err := row.Scan(&produk.Id, &produk.Nama, &produk.Keterangan, &produk.Stok, &produk.Harga)
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("produk tidak ditemukan")

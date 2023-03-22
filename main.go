@@ -1,10 +1,44 @@
 package main
 
 import (
+	"database/sql"
 	"dudeStore/config"
 	"dudeStore/data"
 	"fmt"
 )
+
+func FormUpdate(mdl data.Model, db *sql.DB) {
+	mdl.SetSQLConnection(db)
+	var id int
+	fmt.Print("Masukkan ID produk yang ingin diupdate: ")
+	fmt.Scanln(&id)
+
+	existingProduk, err := mdl.GetProdukById(id)
+	if err != nil {
+		fmt.Printf("Gagal mendapatkan produk: %v\n\n", err)
+	} else if existingProduk == nil {
+		fmt.Printf("Tidak ada produk dengan ID %d\n\n", id)
+	} else {
+		fmt.Printf("Produk saat ini: %+v\n", existingProduk)
+
+		var updatedProduk data.Produk
+		fmt.Print("Masukkan nama produk baru: ")
+		fmt.Scanln(&updatedProduk.Nama)
+		fmt.Print("Masukkan keterangan produk baru: ")
+		fmt.Scanln(&updatedProduk.Keterangan)
+		fmt.Print("Masukkan stok produk baru: ")
+		fmt.Scanln(&updatedProduk.Stok)
+		fmt.Print("Masukkan harga produk baru: ")
+		fmt.Scanln(&updatedProduk.Harga)
+
+		err = mdl.UpdateProduk(id, updatedProduk)
+		if err != nil {
+			fmt.Printf("Gagal mengupdate produk: %v\n\n", err)
+		} else {
+			fmt.Println("Produk berhasil diupdate\n")
+		}
+	}
+}
 
 func main() {
 	koneksi := config.InitSQL()
@@ -86,45 +120,17 @@ func main() {
 				fmt.Scanln(&produk.Stok)
 				fmt.Print("Masukkan Harga produk: ")
 				fmt.Scanln(&produk.Harga)
-				produk.Pegawai_id = id
+				produk.Pegawai_id = res.Id
 				// fmt.Print(produk)
 				err := mdl.TambahProduk(produk)
 				if err != nil {
 					fmt.Printf("GAGAL menahbahkan Produk\n\n")
 
-				} else if menu == 5 {
-					fmt.Print("Masukkan ID produk yang ingin diupdate: ")
-					var id int
-					fmt.Scanln(&id)
-
-					existingProduk, err := mdl.GetProdukById(id)
-					if err != nil {
-						fmt.Printf("Gagal mendapatkan produk: %v\n\n", err)
-					} else if existingProduk == nil {
-						fmt.Printf("Tidak ada produk dengan ID %d\n\n", id)
-					} else {
-						fmt.Printf("Produk saat ini: %+v\n", existingProduk)
-
-						var updatedProduk data.Produk
-						fmt.Print("Masukkan nama produk baru: ")
-						fmt.Scanln(&updatedProduk.Nama)
-						fmt.Print("Masukkan keterangan produk baru: ")
-						fmt.Scanln(&updatedProduk.Keterangan)
-						fmt.Print("Masukkan stok produk baru: ")
-						fmt.Scanln(&updatedProduk.Stok)
-						fmt.Print("Masukkan harga produk baru: ")
-						fmt.Scanln(&updatedProduk.Harga)
-
-						err = mdl.UpdateProduk(id, updatedProduk)
-						if err != nil {
-							fmt.Printf("Gagal mengupdate produk: %v\n\n", err)
-						} else {
-							fmt.Println("Produk berhasil diupdate\n")
-						}
-					}
 				} else {
 					fmt.Printf("Produk BERHASIL ditambahkan!\n\n")
 				}
+			} else if menu == 5 {
+				FormUpdate(mdl, koneksi)
 			}
 		}
 	} else {
