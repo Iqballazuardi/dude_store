@@ -1,8 +1,8 @@
 package main
 
 import (
-	"dudeStore/dudeStore/config"
-	"dudeStore/dudeStore/data"
+	"dudeStore/config"
+	"dudeStore/data"
 	"fmt"
 )
 
@@ -38,6 +38,7 @@ func main() {
 			fmt.Println("0.Log Out")
 			fmt.Scanln(&menu)
 			if menu == 0 {
+				fmt.Println("Terima kasih telah melakukan pekerjaan anda")
 				break
 			} else if menu == 1 {
 				var pegawai = data.Pegawai{}
@@ -79,12 +80,36 @@ func main() {
 				for i := 0; i < len(res); i++ {
 					fmt.Println(res[i])
 				}
+			} else if menu == 4 {
+				var produk = data.Produk{}
+				fmt.Print("Masukkan Nama produk: ")
+				fmt.Scanln(&produk.Nama)
+				fmt.Print("Masukkan keterangan produk: ")
+				fmt.Scanln(&produk.Keterangan)
+				fmt.Print("Masukkan Stok produk: ")
+				fmt.Scanln(&produk.Stok)
+				fmt.Print("Masukkan Harga produk: ")
+				fmt.Scanln(&produk.Harga)
+				err := mdl.TambahProduk(produk)
+				if err != nil {
+					fmt.Printf("GAGAL menahbahkan Produk\n\n")
+
+				} else {
+
+					fmt.Printf("Pegawai BERHASIL ditambahkan!\n\n")
+				}
 			}
 		}
 	} else {
+
 		var menu int
 		for menu != 99 {
-			fmt.Println("Selamat datang pegawai")
+			res, err := mdl.Login(username, password)
+			if err != nil {
+				fmt.Println("password/username salah")
+				break
+			}
+			fmt.Println("halo selamat datang " + res.Nama)
 			fmt.Println("1.Tambahkan Pelanggan")
 			fmt.Println("2.Tambahkan Produk")
 			fmt.Println("3.Update Produk")
@@ -93,7 +118,26 @@ func main() {
 			fmt.Println("0.Log Out")
 			fmt.Scanln(&menu)
 			if menu == 0 {
+				fmt.Println("Terima kasih telah melakukan pekerjaan anda")
 				break
+			} else if menu == 5 {
+				var produk = data.Produk{}
+				fmt.Print("Masukkan Nama produk: ")
+				fmt.Scanln(&produk.Nama)
+				fmt.Print("Masukkan keterangan produk: ")
+				fmt.Scanln(&produk.Keterangan)
+				fmt.Print("Masukkan Stok produk: ")
+				fmt.Scanln(&produk.Stok)
+				fmt.Print("Masukkan Harga produk: ")
+				fmt.Scanln(&produk.Harga)
+				err := mdl.TambahProduk(produk)
+				if err != nil {
+					fmt.Printf("GAGAL menahbahkan Produk\n\n")
+
+				} else {
+
+					fmt.Printf("Pegawai BERHASIL ditambahkan!\n\n")
+				}
 			}
 		}
 	}

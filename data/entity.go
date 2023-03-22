@@ -8,9 +8,9 @@ type Produk struct {
 	Keterangan string
 	Stok       int
 	Harga      int
-	Create_at  time.Time
-	Update_at  time.Time
 	Pegawai_id int
+	Create_at  string
+	Update_at  time.Time
 }
 
 type Pegawai struct {
@@ -19,7 +19,7 @@ type Pegawai struct {
 	Username  string
 	Password  string
 	Email     string
-	Create_at time.Time
+	Create_at string
 	Delete_at time.Time
 }
 
