@@ -6,6 +6,7 @@ import (
 	"dudeStore/data"
 	"dudeStore/helpers"
 	"fmt"
+	"log"
 )
 
 func FormUpdate(mdl data.Model, db *sql.DB) {
@@ -195,6 +196,53 @@ func main() {
 				}
 
 				fmt.Println("sukses menghapus data")
+
+			} else if menu == 11 {
+				var pelanggan int
+				var produk []int
+				var qty []int
+				err := mdl.LihatDaftarPelanggan()
+				if err != nil {
+					log.Fatal(err)
+					continue
+				}
+				fmt.Println()
+				fmt.Print("Masukan id pelanggan: ")
+				fmt.Scanln(&pelanggan)
+
+				err1 := mdl.LihatDaftarProduk()
+				if err1 != nil {
+					fmt.Println("Terjadi sebuah kesalahan")
+					fmt.Println(err1)
+				}
+				fmt.Println()
+				isrepeat := true
+				var choice string
+				for isrepeat {
+					var produkid int
+					var qtyy int
+					if choice == "t" {
+						break
+					}
+					fmt.Print("Masukan Produk: ")
+					fmt.Scanln(&produkid)
+					produk = append(produk, produkid)
+					fmt.Print("Masukan Masukan Qty: ")
+					fmt.Scanln(&qtyy)
+					qty = append(qty, qtyy)
+					fmt.Print("Apakah ingin menambah produk lagi? (y/t): ")
+					fmt.Scanln(&choice)
+				}
+				prdk, _ := mdl.DaftarProduk()
+				fmt.Println(produk, qty)
+				for i, val := range produk {
+					produks := prdk[val]
+					err := mdl.InsertTransaksi(&data.Transaksi{Nama_produk: produks.Nama, Qty: qty[i], Pelanggan_id: pelanggan, Pegawai_id: id})
+					if err != nil {
+						fmt.Println("Error pada index", i, err)
+						break
+					}
+				}
 			}
 		}
 	} else {
