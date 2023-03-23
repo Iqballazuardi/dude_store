@@ -14,7 +14,11 @@ func StartCmd() {
   **     **  **********     **       **     **          
   **     **  **********     **       **     **          
 
-             Dude Service App								 
+             Dude Service App			
+○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○	
+Dude adalah sebuah aplikasi yang digunakan untuk
+mencatat kegiatan transaksi di sebuah toko secara
+                  online                       
 ○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○	
    `
 	fmt.Println(text)
