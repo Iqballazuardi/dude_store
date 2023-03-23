@@ -72,22 +72,25 @@ func main() {
 				fmt.Println("Mohon coba lagi")
 			}
 
+			id = res.Id
+			nama = res.Nama
 			fmt.Println()
 			fmt.Println("===========================")
 			fmt.Println("Halo selamat datang " + res.Nama)
 			fmt.Println("===========================")
-			// fmt.Println()
 			fmt.Println("1.Tambahkan Pegawai")
 			fmt.Println("2.Hapus Pegawai")
 			fmt.Println("3.Daftar Pegawai")
 			fmt.Println("4.Tambahkan Produk")
-			fmt.Println("5.update Produk")
-			fmt.Println("6.Hapus Produk")
-			fmt.Println("7.Tambahkan Pelanggan")
-			fmt.Println("8.Hapus Pelanggan")
-			fmt.Println("9.Tambahkan Transaksi")
-			fmt.Println("10.Daftar Transaksi")
-			fmt.Println("11.Hapus Transaksi")
+			fmt.Println("5.Update Produk")
+			fmt.Println("6.Daftar Produk")
+			fmt.Println("7.Hapus Produk")
+			fmt.Println("8.Tambahkan Pelanggan")
+			fmt.Println("9.Daftar Pelanggan")
+			fmt.Println("10.Hapus Pelanggan")
+			fmt.Println("11.Tambahkan Transaksi")
+			fmt.Println("12.Daftar Transaksi")
+			fmt.Println("13.Hapus Transaksi")
 			fmt.Println("0.Log Out")
 			fmt.Println("=====================")
 			fmt.Printf("Enter piliihan kamu : ")
@@ -120,6 +123,7 @@ func main() {
 			} else if menu == 3 {
 				err := mdl.LihatDaftarPegawai()
 				if err != nil {
+					fmt.Println(err)
 					fmt.Println("Terjadi sebuah kesalahan")
 				}
 			} else if menu == 4 {
@@ -192,6 +196,7 @@ func main() {
 				}
 
 				fmt.Println("sukses menghapus data")
+
 			} else if menu == 11 {
 				var pelanggan int
 				var produk []int
@@ -238,7 +243,6 @@ func main() {
 						break
 					}
 				}
-
 			}
 		}
 	} else {
@@ -255,8 +259,6 @@ func main() {
 			fmt.Println("===========================")
 			fmt.Println("Halo selamat datang " + nama)
 			fmt.Println("===========================")
-			// fmt.Println("halo selamat datang " + nama)
-			// fmt.Println(res)
 			fmt.Println("1.Tambahkan Pelanggan")
 			fmt.Println("2.Tambahkan Produk")
 			fmt.Println("3.Update Produk")
@@ -283,7 +285,6 @@ func main() {
 				fmt.Print("Masukkan Alamat pelanggan: ")
 				fmt.Scanln(&pelanggan.Alamat)
 				pelanggan.Pegawai_id = id
-				// fmt.Print(pelanggan)
 				err := mdl.TambahPelanggan(pelanggan)
 				if err != nil {
 					fmt.Printf("GAGAL menahbahkan pelanggan\n\n")

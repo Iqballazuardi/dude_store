@@ -208,7 +208,7 @@ func (m *Model) UpdateProduk(id int, updatedProduk Produk) error {
 }
 
 func (m *Model) DaftarPegawai() ([]Pegawai, error) {
-	rows, err := m.conn.Query("SELECT idpegawai, nama, username, password, email, created_at FROM pegawai")
+	rows, err := m.conn.Query("SELECT idpegawai, nama, username, password, email, create_at FROM pegawai")
 	if err != nil {
 		return nil, err
 	}
@@ -336,6 +336,7 @@ func (m *Model) DaftarProduk() ([]Produk, error) {
 
 	return daftarProduk, nil
 }
+
 func (m *Model) InsertTransaksi(t *Transaksi) error {
 	query := "INSERT INTO transaksi (nama_produk, qty, created_at, pelangan_idpelangan, pegawai_idpegawai) VALUES (?, ?, ?, ?, ?)"
 	stmt, err := m.conn.Prepare(query)
@@ -360,6 +361,7 @@ func (m *Model) InsertTransaksi(t *Transaksi) error {
 
 	return nil
 }
+
 func (m *Model) LihatDaftarProduk() error {
 	produk, err := m.DaftarProduk()
 	if err != nil {
@@ -371,9 +373,10 @@ func (m *Model) LihatDaftarProduk() error {
 		return nil
 	}
 
-	fmt.Println("Daftar Produk:")
+
 	for i, p := range produk {
 		fmt.Printf("%d. ID: %d, Nama: %s, Keterangan: %s, Stok: %d, Harga: %d, Ditambahkan OLeh Pegawai Ber ID: %d\n", i+1, p.Id, p.Nama, p.Keterangan, p.Stok, p.Harga, p.Pegawai_id)
+
 	}
 	return nil
 }
@@ -400,6 +403,7 @@ func (m *Model) DeleteProduk(id int) error {
 	return nil
 }
 
+
 func (m *Model) TransaksiBarang(idBarang int, jumlah int, idPegawai int) error {
 	// Cek apakah barang tersedia
 	var stok int
@@ -425,3 +429,4 @@ func (m *Model) TransaksiBarang(idBarang int, jumlah int, idPegawai int) error {
 
 	return nil
 }
+
