@@ -201,7 +201,10 @@ func main() {
 			}
 			id = res.Id
 			nama = res.Nama
-			fmt.Println("halo selamat datang " + nama)
+			fmt.Println()
+			fmt.Println("===========================")
+			fmt.Println("Halo selamat datang " + nama)
+			fmt.Println("===========================")
 			fmt.Println("1.Tambahkan Pelanggan")
 			fmt.Println("2.Tambahkan Produk")
 			fmt.Println("3.Update Produk")
