@@ -19,7 +19,7 @@ type Pegawai struct {
 	Username  string
 	Password  string
 	Email     string
-	Create_at string
+	Create_at time.Time
 	Delete_at time.Time
 }
 

@@ -82,29 +82,29 @@ func (m *Model) DeletePegawai(Email string) error {
 	return nil
 }
 
-func (m Model) GetAllPegawai() ([]Pegawai, error) {
-	listPegawai := []Pegawai{}
-	rows, err := m.conn.Query("SELECT idpegawai, nama, username, email, create_at FROM pegawai")
+// func (m Model) GetAllPegawai() ([]Pegawai, error) {
+// 	listPegawai := []Pegawai{}
+// 	rows, err := m.conn.Query("SELECT idpegawai, nama, username, email, create_at FROM pegawai")
 
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-	// createdAt, err := time.Parse("2006-01-02 15:04:05", string(newPegawai.Create_at))
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return nil, err
+// 	}
+// 	// createdAt, err := time.Parse("2006-01-02 15:04:05", string(newPegawai.Create_at))
 
-	for rows.Next() {
-		var newPegawai = Pegawai{}
-		if err := rows.Scan(&newPegawai.Id, &newPegawai.Nama, &newPegawai.Username, &newPegawai.Email, &newPegawai.Create_at); err != nil {
-			fmt.Println(err)
-			return nil, err
-		}
+// 	for rows.Next() {
+// 		var newPegawai = Pegawai{}
+// 		if err := rows.Scan(&newPegawai.Id, &newPegawai.Nama, &newPegawai.Username, &newPegawai.Email, &newPegawai.Create_at); err != nil {
+// 			fmt.Println(err)
+// 			return nil, err
+// 		}
 
-		listPegawai = append(listPegawai, newPegawai)
-	}
-	// m.conn.Close()
+// 		listPegawai = append(listPegawai, newPegawai)
+// 	}
+// 	// m.conn.Close()
 
-	return listPegawai, nil
-}
+//		return listPegawai, nil
+//	}
 func (m *Model) TambahProduk(newProduk Produk) error {
 	res, err := m.conn.Exec("INSERT INTO produk (nama, keterangan, stok , harga, pegawai_idpegawai) values(?,?,?,?,?)", newProduk.Nama, newProduk.Keterangan, newProduk.Stok, newProduk.Harga, newProduk.Pegawai_id)
 
@@ -203,5 +203,48 @@ func (m *Model) UpdateProduk(id int, updatedProduk Produk) error {
 		return errors.New("tidak ada produk yang diupdate")
 	}
 
+	return nil
+}
+
+func (m *Model) DaftarPegawai() ([]Pegawai, error) {
+	rows, err := m.conn.Query("SELECT idpegawai, nama, username, password, email, created_at FROM pegawai")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var daftarPegawai []Pegawai
+
+	for rows.Next() {
+		var pegawai Pegawai
+		err := rows.Scan(&pegawai.Id, &pegawai.Nama, &pegawai.Username, &pegawai.Password, &pegawai.Email, &pegawai.Create_at)
+		if err != nil {
+			return nil, err
+		}
+		daftarPegawai = append(daftarPegawai, pegawai)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return daftarPegawai, nil
+}
+
+func (m *Model) LihatDaftarPegawai() error {
+	pegawai, err := m.DaftarPegawai()
+	if err != nil {
+		return err
+	}
+
+	if len(pegawai) == 0 {
+		fmt.Println("Tidak ada pegawai yang terdaftar")
+		return nil
+	}
+
+	fmt.Println("Daftar pegawai:")
+	for _, p := range pegawai {
+		fmt.Printf("ID: %d, Nama: %s, Username: %s, Email: %s\n", p.Id, p.Nama, p.Username, p.Email)
+	}
 	return nil
 }
