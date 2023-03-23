@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"dudeStore/config"
 	"dudeStore/data"
+	"dudeStore/helpers"
 	"fmt"
 )
 
@@ -44,15 +45,21 @@ func main() {
 	koneksi := config.InitSQL()
 	mdl := data.Model{}
 	mdl.SetSQLConnection(koneksi)
+	// ui := &LihatDaftarPegawai{mdl}
 	var id int
 	var nama string
 	var username string
 	var password string
 
-	fmt.Println("Silahkan login")
-	fmt.Println("Masukan username")
+	fmt.Println()
+	helpers.StartCmd()
+
+	fmt.Println("=========================")
+	fmt.Println("   Silahkan login dude   ")
+	fmt.Println("=========================")
+	fmt.Printf("Masukan username : ")
 	fmt.Scanln(&username)
-	fmt.Println("Masukan password")
+	fmt.Printf("Masukan password : ")
 	fmt.Scanln(&password)
 
 	if username == "admin" {
@@ -61,9 +68,13 @@ func main() {
 			res, err := mdl.Login(username, password)
 			if err != nil {
 				fmt.Println("password/username salah", err)
-				break
 			}
-			fmt.Println("halo selamat datang " + res.Nama)
+
+			fmt.Println()
+			fmt.Println("===========================")
+			fmt.Println("Halo selamat datang " + res.Nama)
+			fmt.Println("===========================")
+			// fmt.Println()
 			fmt.Println("1.Tambahkan Pegawai")
 			fmt.Println("2.Hapus Pegawai")
 			fmt.Println("3.Daftar Pegawai")
@@ -76,9 +87,11 @@ func main() {
 			fmt.Println("10.Daftar Transaksi")
 			fmt.Println("11.Hapus Transaksi")
 			fmt.Println("0.Log Out")
+			fmt.Println()
+			fmt.Printf("Pilih piliihan anda : ")
 			fmt.Scanln(&menu)
 			if menu == 0 {
-				fmt.Println("Terima kasih telah melakukan pekerjaan anda")
+				helpers.CloseCmd()
 				break
 			} else if menu == 1 {
 				err := mdl.TambahPegawai(data.Pegawai{})
@@ -96,19 +109,13 @@ func main() {
 				err := mdl.DeletePegawai(email)
 				if err != nil {
 					fmt.Println("Terjadi sebuah kesalahan")
-					break
 				}
 
 				fmt.Println("sukses menghapus data")
 			} else if menu == 3 {
-				res, err := mdl.GetAllPegawai()
+				err := mdl.LihatDaftarPegawai()
 				if err != nil {
 					fmt.Println("Terjadi sebuah kesalahan")
-					break
-				}
-
-				for i := 0; i < len(res); i++ {
-					fmt.Println(res[i])
 				}
 			} else if menu == 4 {
 				var produk = data.Produk{}
@@ -140,7 +147,6 @@ func main() {
 			res, err := mdl.Login(username, password)
 			if err != nil {
 				fmt.Println("password/username salah", err)
-				break
 			}
 			id = res.Id
 			nama = res.Nama
@@ -156,7 +162,7 @@ func main() {
 			fmt.Println("0.Log Out")
 			fmt.Scanln(&menu)
 			if menu == 0 {
-				fmt.Println("Terima kasih telah melakukan pekerjaan anda")
+				helpers.CloseCmd()
 				break
 			} else if menu == 1 {
 				var pelanggan = data.Pelanggan{}
