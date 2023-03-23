@@ -68,6 +68,7 @@ func main() {
 			res, err := mdl.Login(username, password)
 			if err != nil {
 				fmt.Println("password/username salah", err)
+				fmt.Println("Mohon coba lagi")
 			}
 
 			fmt.Println()
@@ -92,6 +93,7 @@ func main() {
 			fmt.Scanln(&menu)
 			if menu == 0 {
 				helpers.CloseCmd()
+				helpers.WordBye()
 				break
 			} else if menu == 1 {
 				err := mdl.TambahPegawai(data.Pegawai{})
@@ -150,7 +152,11 @@ func main() {
 			}
 			id = res.Id
 			nama = res.Nama
-			fmt.Println("halo selamat datang " + nama)
+			fmt.Println()
+			fmt.Println("===========================")
+			fmt.Println("Halo selamat datang " + nama)
+			fmt.Println("===========================")
+			// fmt.Println("halo selamat datang " + nama)
 			// fmt.Println(res)
 			fmt.Println("1.Tambahkan Pelanggan")
 			fmt.Println("2.Tambahkan Produk")
@@ -163,6 +169,7 @@ func main() {
 			fmt.Scanln(&menu)
 			if menu == 0 {
 				helpers.CloseCmd()
+				helpers.WordBye()
 				break
 			} else if menu == 1 {
 				var pelanggan = data.Pelanggan{}
