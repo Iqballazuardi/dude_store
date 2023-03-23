@@ -122,6 +122,7 @@ func main() {
 			} else if menu == 3 {
 				err := mdl.LihatDaftarPegawai()
 				if err != nil {
+					fmt.Println(err)
 					fmt.Println("Terjadi sebuah kesalahan")
 				}
 			} else if menu == 4 {

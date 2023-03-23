@@ -207,7 +207,7 @@ func (m *Model) UpdateProduk(id int, updatedProduk Produk) error {
 }
 
 func (m *Model) DaftarPegawai() ([]Pegawai, error) {
-	rows, err := m.conn.Query("SELECT idpegawai, nama, username, password, email, created_at FROM pegawai")
+	rows, err := m.conn.Query("SELECT idpegawai, nama, username, password, email, create_at FROM pegawai")
 	if err != nil {
 		return nil, err
 	}
