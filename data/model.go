@@ -25,6 +25,18 @@ func (m *Model) Login(username string, password string) (*Pegawai, error) {
 	// m.conn.Close()
 	return &pegawai, nil
 }
+func (m *Model) CekPelanggan(hp string) (*Pelanggan, error) {
+	var pelanggan = Pelanggan{}
+	fmt.Println(hp)
+	err := m.conn.QueryRow("SELECT nama ,idpelangan FROM pelanggan where hp = ?",
+		hp).Scan(&pelanggan.Nama, &pelanggan.Id)
+
+	if err != nil {
+		return nil, err
+	}
+	// m.conn.Close()
+	return &pelanggan, nil
+}
 
 func (m *Model) TambahPegawai(Pegawai) error {
 	var pegawai = Pegawai{}
@@ -82,29 +94,6 @@ func (m *Model) DeletePegawai(Email string) error {
 	return nil
 }
 
-// func (m Model) GetAllPegawai() ([]Pegawai, error) {
-// 	listPegawai := []Pegawai{}
-// 	rows, err := m.conn.Query("SELECT idpegawai, nama, username, email, create_at FROM pegawai")
-
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		return nil, err
-// 	}
-// 	// createdAt, err := time.Parse("2006-01-02 15:04:05", string(newPegawai.Create_at))
-
-// 	for rows.Next() {
-// 		var newPegawai = Pegawai{}
-// 		if err := rows.Scan(&newPegawai.Id, &newPegawai.Nama, &newPegawai.Username, &newPegawai.Email, &newPegawai.Create_at); err != nil {
-// 			fmt.Println(err)
-// 			return nil, err
-// 		}
-
-// 		listPegawai = append(listPegawai, newPegawai)
-// 	}
-// 	// m.conn.Close()
-
-//		return listPegawai, nil
-//	}
 func (m *Model) TambahProduk(newProduk Produk) error {
 	res, err := m.conn.Exec("INSERT INTO produk (nama, keterangan, stok , harga, pegawai_idpegawai) values(?,?,?,?,?)", newProduk.Nama, newProduk.Keterangan, newProduk.Stok, newProduk.Harga, newProduk.Pegawai_id)
 
@@ -307,13 +296,13 @@ func (m *Model) LihatDaftarPelanggan() error {
 
 	fmt.Println("Daftar Pelanggan:")
 	for _, p := range pelanggan {
-		fmt.Printf("ID: %d, Nama: %s, Hp: %s, Alamat: %s, Ditambahkan OLeh Pegawai Ber ID: %d\n,", p.Id, p.Nama, p.Hp, p.Alamat, p.Pegawai_id)
+		fmt.Printf("ID: %d, Nama: %s, Hp: %s, Alamat: %s, Ditambahkan OLeh Pegawai Ber ID: %d\n", p.Id, p.Nama, p.Hp, p.Alamat, p.Pegawai_id)
 	}
 	return nil
 }
 
 func (m *Model) DaftarProduk() ([]Produk, error) {
-	rows, err := m.conn.Query("SELECT idproduk, nama, keterangan, stok,harga, pegawai_idpegawai, create_at FROM produk")
+	rows, err := m.conn.Query("SELECT idproduk, nama, keterangan, stok,harga, pegawai_idpegawai, create_at FROM produk ")
 	if err != nil {
 		return nil, err
 	}
@@ -354,6 +343,170 @@ func (m *Model) LihatDaftarProduk() error {
 }
 func (m *Model) DeleteProduk(id int) error {
 	res, err := m.conn.Exec("DELETE FROM produk WHERE idproduk = ?", id)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	aff, err := res.RowsAffected()
+
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	if aff <= 0 {
+		return errors.New("terjadi sebuah masalah pada sistem")
+	}
+
+	// m.conn.Close()
+
+	return nil
+}
+
+func (m *Model) TambahTransaksi(newTransaksi Transaksi) (*Transaksi, error) {
+	res, err := m.conn.Exec("INSERT INTO transaksi (total_transaksi, pegawai_idpegawai, pelangan_idpelangan) values(?,?,?)", newTransaksi.Total_transaksi, newTransaksi.Pegawai_id, newTransaksi.Pelanggan_id)
+
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	// Ambil ID dari data terakhir yang di-insert
+	lastInsertID, err := res.LastInsertId()
+
+	aff, err := res.RowsAffected()
+
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	if aff <= 0 {
+		return nil, errors.New("terjadi sebuah masalah pada sistem")
+	}
+
+	row := m.conn.QueryRow("SELECT idtransaksi, total_transaksi, created_at, pegawai_idpegawai, pelangan_idpelangan  FROM transaksi WHERE idtransaksi = ?", lastInsertID)
+
+	var transaksi Transaksi
+	erre := row.Scan(&transaksi.Id, &transaksi.Total_transaksi, &transaksi.Create_at, &transaksi.Pelanggan_id, &transaksi.Pegawai_id)
+
+	if erre != nil {
+		fmt.Println(erre)
+		return nil, erre
+	}
+
+	return &transaksi, nil
+}
+
+func (m *Model) TambahDetailTransaksi(newDetailTransaksi Detail_transaksi) error {
+	res, err := m.conn.Exec("INSERT INTO detail_transaksi (qty, total_transaksi, produk_idproduk , transaksi_idtransaksi) values(?,?,?,?)", newDetailTransaksi.Qty, newDetailTransaksi.Total_transaksi, newDetailTransaksi.Produk_id, newDetailTransaksi.Transaksi_id)
+
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	aff, err := res.RowsAffected()
+
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	if aff <= 0 {
+		return errors.New("terjadi sebuah masalah pada sistem")
+	}
+
+	// m.conn.Close()
+
+	return nil
+}
+func (m *Model) DaftarTransaksi() ([]Transaksi, error) {
+	rows, err := m.conn.Query("SELECT idtransaksi, total_transaksi,created_at, pegawai_idpegawai,pelangan_idpelangan FROM transaksi")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var daftarTransaksi []Transaksi
+
+	for rows.Next() {
+		var transaksi Transaksi
+		err := rows.Scan(&transaksi.Id, &transaksi.Total_transaksi, &transaksi.Create_at, &transaksi.Pegawai_id, &transaksi.Pelanggan_id)
+		if err != nil {
+			return nil, err
+		}
+		daftarTransaksi = append(daftarTransaksi, transaksi)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return daftarTransaksi, nil
+}
+func (m *Model) LihatDaftarTransaksi() error {
+	transaksi, err := m.DaftarTransaksi()
+	if err != nil {
+		return err
+	}
+
+	if len(transaksi) == 0 {
+		fmt.Println("Tidak ada Transaksi yang terdaftar")
+		return nil
+	}
+
+	fmt.Println("Daftar Transaksi:")
+	for _, p := range transaksi {
+		fmt.Printf("ID Transaksi: %d,ID pelanggan:%d, Total Transaksi: %d,  ID Pegawai: %d, Ditambahkan Pada: %s\n", p.Id, p.Pelanggan_id, p.Total_transaksi, p.Pegawai_id, p.Create_at)
+	}
+	return nil
+}
+
+func (m *Model) DaftarDetailTransaksi() ([]Detail_transaksi, error) {
+	rows, err := m.conn.Query("SELECT iddetail_transaksi,qty,total_transaksi,produk_idproduk,transaksi_idtransaksi FROM detail_transaksi")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var daftarDetailTransaksi []Detail_transaksi
+
+	for rows.Next() {
+		var detailTransaksi Detail_transaksi
+		err := rows.Scan(&detailTransaksi.Id, &detailTransaksi.Total_transaksi, &detailTransaksi.Qty, &detailTransaksi.Transaksi_id, &detailTransaksi.Produk_id)
+		if err != nil {
+			return nil, err
+		}
+		daftarDetailTransaksi = append(daftarDetailTransaksi, detailTransaksi)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return daftarDetailTransaksi, nil
+}
+func (m *Model) LihatDaftarDetailTransaksi() error {
+	detailTransaksi, err := m.DaftarDetailTransaksi()
+	if err != nil {
+		return err
+	}
+
+	if len(detailTransaksi) == 0 {
+		fmt.Println("Tidak ada Transaksi yang terdaftar")
+		return nil
+	}
+
+	fmt.Println("Daftar Detail Transaksi:")
+	for _, p := range detailTransaksi {
+		fmt.Printf("ID Detail Transaksi: %d, QTY:%d, Total Transaksi: %d,  ID Produk: %d, ID Transaksi : %d\n", p.Id, p.Qty, p.Total_transaksi, p.Produk_id, p.Total_transaksi)
+	}
+	return nil
+}
+func (m *Model) DeleteTransaksi(id int) error {
+	res, err := m.conn.Exec("DELETE FROM transaksi WHERE idtransaksi = ?", id)
 	if err != nil {
 		fmt.Println(err)
 		return err

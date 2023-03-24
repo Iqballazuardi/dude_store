@@ -25,8 +25,6 @@ type Pegawai struct {
 
 type Transaksi struct {
 	Id              int
-	Nama_produk     string
-	Qty             int
 	Total_transaksi int
 	Create_at       string
 	Pelanggan_id    int

@@ -89,7 +89,8 @@ func main() {
 			fmt.Println("10.Hapus Pelanggan")
 			fmt.Println("11.Tambahkan Transaksi")
 			fmt.Println("12.Daftar Transaksi")
-			fmt.Println("13.Hapus Transaksi")
+			fmt.Println("13.Daftar Detail Transaksi")
+			fmt.Println("14.Hapus Transaksi")
 			fmt.Println("0.Log Out")
 			fmt.Println("=====================")
 			fmt.Printf("Enter piliihan kamu : ")
@@ -195,6 +196,111 @@ func main() {
 				}
 
 				fmt.Println("sukses menghapus data")
+			} else if menu == 11 {
+				exit := 0
+				type Info struct {
+					Id        int
+					QtyProduk int
+					Harga     int
+					Total     int
+				}
+				var totalTransaki = data.Transaksi{}
+				// var detailTransaki = data.Detail_transaksi{}
+				var hp string
+				var idProduk int
+				var produks []data.Produk
+				arrProduk := []Info{}
+				totalHarga := 0
+				var qty int
+				fmt.Println("=====================")
+				fmt.Println("Tambah Transaksi")
+				fmt.Println("=====================")
+				resProduks, err := mdl.DaftarProduk()
+				if err != nil {
+					fmt.Println("Terjadi sebuah kesalahan")
+					fmt.Println(err)
+				}
+				if len(produks) == 0 {
+					fmt.Println("Tidak ada produk yang terdaftar")
+				}
+
+				fmt.Println("Daftar Produk:")
+				produks = resProduks
+				for _, p := range resProduks {
+					fmt.Printf("ID: %d, Nama: %s, Keterangan: %s, Stok: %d, Harga: %d, Ditambahkan OLeh Pegawai Ber ID: %d\n", p.Id, p.Nama, p.Keterangan, p.Stok, p.Harga, p.Pegawai_id)
+				}
+				fmt.Println("Masukan Nomor HandaPhone Pelanggan")
+				fmt.Scanln(&hp)
+
+				respon, err := mdl.CekPelanggan(hp)
+				if err != nil {
+					fmt.Println("Pelanggan tidak terdaftar", err)
+					fmt.Println("Mohon coba lagi")
+				}
+				fmt.Println("Nama Pelanggan Anda :" + respon.Nama)
+				for exit == 0 {
+					fmt.Println("Pilih Produk di atas :")
+					fmt.Scanln(&idProduk)
+					produkById, err := mdl.GetProdukById(idProduk)
+					if err != nil {
+						fmt.Println("Produk tidak terdaftar", err)
+						fmt.Println("Mohon coba lagi")
+					}
+					fmt.Println("Masukan jumlah Produk :")
+					fmt.Scanln(&qty)
+					arrProduk = append(arrProduk, Info{Id: idProduk, QtyProduk: qty, Harga: produkById.Harga, Total: (produkById.Harga * qty)})
+					fmt.Println("Ketik (0) untuk lanjut || Ketik (99) untuk berhenti ")
+					fmt.Scanln(&exit)
+
+					for i := 0; i < len(arrProduk); i++ {
+						totalHarga += arrProduk[i].Total
+					}
+				}
+
+				totalTransaki.Total_transaksi = totalHarga
+				totalTransaki.Pegawai_id = res.Id
+				totalTransaki.Pelanggan_id = respon.Id
+				result, eror := mdl.TambahTransaksi(totalTransaki)
+				if eror != nil {
+					fmt.Printf("GAGAL menahbahkan Transaksi\n\n")
+				} else {
+					fmt.Printf("Transaksi BERHASIL ditambahkan!\n\n")
+					var detail_transaksi = data.Detail_transaksi{}
+					for i := 0; i < len(arrProduk); i++ {
+						detail_transaksi.Qty = arrProduk[i].QtyProduk
+						detail_transaksi.Total_transaksi = arrProduk[i].Total
+						detail_transaksi.Transaksi_id = result.Id
+						detail_transaksi.Produk_id = arrProduk[i].Id
+						errror := mdl.TambahDetailTransaksi(detail_transaksi)
+						if errror != nil {
+							fmt.Printf("GAGAL menahbahkan Transaksi\n\n")
+
+						}
+					}
+				}
+
+			} else if menu == 12 {
+				err := mdl.LihatDaftarTransaksi()
+				if err != nil {
+					fmt.Println("Terjadi sebuah kesalahan")
+					fmt.Println(err)
+				}
+			} else if menu == 13 {
+				err := mdl.LihatDaftarDetailTransaksi()
+				if err != nil {
+					fmt.Println("Terjadi sebuah kesalahan")
+					fmt.Println(err)
+				}
+			} else if menu == 14 {
+				var Id int
+				fmt.Print("Masukkan Id Transaksi:")
+				fmt.Scanln(&Id)
+				err := mdl.DeleteTransaksi(Id)
+				if err != nil {
+					fmt.Println("Terjadi sebuah kesalahan")
+				}
+
+				fmt.Println("sukses menghapus data")
 			}
 		}
 	} else {
@@ -218,6 +324,7 @@ func main() {
 			fmt.Println("5.Daftar Pelanggan")
 			fmt.Println("6.Tambahkan Transaksi")
 			fmt.Println("7.Daftar Transaksi")
+			fmt.Println("8.Daftar Detail Transaksi")
 			fmt.Println("0.Log Out")
 			fmt.Println("=====================")
 			fmt.Printf("Enter pilihan kamu : ")
@@ -264,6 +371,115 @@ func main() {
 				} else {
 
 					fmt.Printf("Produk BERHASIL ditambahkan!\n\n")
+				}
+			} else if menu == 3 {
+				FormUpdate(mdl, koneksi)
+			} else if menu == 4 {
+				err := mdl.LihatDaftarProduk()
+				if err != nil {
+					fmt.Println("Terjadi sebuah kesalahan")
+					fmt.Println(err)
+				}
+			} else if menu == 5 {
+				err := mdl.LihatDaftarPelanggan()
+				if err != nil {
+					fmt.Println("Terjadi sebuah kesalahan")
+					fmt.Println(err)
+				}
+			} else if menu == 6 {
+				exit := 0
+				type Info struct {
+					Id        int
+					QtyProduk int
+					Harga     int
+					Total     int
+				}
+				var totalTransaki = data.Transaksi{}
+				// var detailTransaki = data.Detail_transaksi{}
+				var hp string
+				var idProduk int
+				var produks []data.Produk
+				arrProduk := []Info{}
+				totalHarga := 0
+				var qty int
+				fmt.Println("=====================")
+				fmt.Println("Tambah Transaksi")
+				fmt.Println("=====================")
+				resProduks, err := mdl.DaftarProduk()
+				if err != nil {
+					fmt.Println("Terjadi sebuah kesalahan")
+					fmt.Println(err)
+				}
+				if len(produks) == 0 {
+					fmt.Println("Tidak ada produk yang terdaftar")
+				}
+
+				fmt.Println("Daftar Produk:")
+				produks = resProduks
+				for _, p := range resProduks {
+					fmt.Printf("ID: %d, Nama: %s, Keterangan: %s, Stok: %d, Harga: %d, Ditambahkan OLeh Pegawai Ber ID: %d\n", p.Id, p.Nama, p.Keterangan, p.Stok, p.Harga, p.Pegawai_id)
+				}
+				fmt.Println("Masukan Nomor HandaPhone Pelanggan")
+				fmt.Scanln(&hp)
+
+				respon, err := mdl.CekPelanggan(hp)
+				if err != nil {
+					fmt.Println("Pelanggan tidak terdaftar", err)
+					fmt.Println("Mohon coba lagi")
+				}
+				fmt.Println("Nama Pelanggan Anda :" + respon.Nama)
+				for exit == 0 {
+					fmt.Println("Pilih Produk di atas :")
+					fmt.Scanln(&idProduk)
+					produkById, err := mdl.GetProdukById(idProduk)
+					if err != nil {
+						fmt.Println("Produk tidak terdaftar", err)
+						fmt.Println("Mohon coba lagi")
+					}
+					fmt.Println("Masukan jumlah Produk :")
+					fmt.Scanln(&qty)
+					arrProduk = append(arrProduk, Info{Id: idProduk, QtyProduk: qty, Harga: produkById.Harga, Total: (produkById.Harga * qty)})
+					fmt.Println("Ketik (0) untuk lanjut || Ketik (99) untuk berhenti ")
+					fmt.Scanln(&exit)
+
+					for i := 0; i < len(arrProduk); i++ {
+						totalHarga += arrProduk[i].Total
+					}
+				}
+
+				totalTransaki.Total_transaksi = totalHarga
+				totalTransaki.Pegawai_id = res.Id
+				totalTransaki.Pelanggan_id = respon.Id
+				result, eror := mdl.TambahTransaksi(totalTransaki)
+				if eror != nil {
+					fmt.Printf("GAGAL menahbahkan Transaksi\n\n")
+				} else {
+					fmt.Printf("Transaksi BERHASIL ditambahkan!\n\n")
+					var detail_transaksi = data.Detail_transaksi{}
+					for i := 0; i < len(arrProduk); i++ {
+						detail_transaksi.Qty = arrProduk[i].QtyProduk
+						detail_transaksi.Total_transaksi = arrProduk[i].Total
+						detail_transaksi.Transaksi_id = result.Id
+						detail_transaksi.Produk_id = arrProduk[i].Id
+						errror := mdl.TambahDetailTransaksi(detail_transaksi)
+						if errror != nil {
+							fmt.Printf("GAGAL menahbahkan Transaksi\n\n")
+
+						}
+					}
+				}
+
+			} else if menu == 7 {
+				err := mdl.LihatDaftarTransaksi()
+				if err != nil {
+					fmt.Println("Terjadi sebuah kesalahan")
+					fmt.Println(err)
+				}
+			} else if menu == 8 {
+				err := mdl.LihatDaftarDetailTransaksi()
+				if err != nil {
+					fmt.Println("Terjadi sebuah kesalahan")
+					fmt.Println(err)
 				}
 			}
 		}
